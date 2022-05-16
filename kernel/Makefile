@@ -116,8 +116,17 @@ $(obj)/configs.o: $(obj)/config_data.h
 
 # config_data.h contains the same information as ikconfig.h but gzipped.
 # Info from config_data can be extracted from /proc/config*
+
+ifneq ($(filter "maple_dsds", $(CONFIG_DEFAULT_HOSTNAME)),)
+original_config := arch/arm64/configs/original_lineage-msm8998-yoshino-maple_dsds_defconfig
+else ifneq ($(filter "maple", $(CONFIG_DEFAULT_HOSTNAME)),)
+original_config := arch/arm64/configs/original_lineage-msm8998-yoshino-maple_defconfig
+else 
+original_config := $(KCONFIG_CONFIG)
+endif
+
 targets += config_data.gz
-$(obj)/config_data.gz: $(KCONFIG_CONFIG) FORCE
+$(obj)/config_data.gz: $(original_config) FORCE
 	$(call if_changed,gzip)
 
       filechk_ikconfiggz = (echo "static const char kernel_config_data[] __used = MAGIC_START"; cat $< | scripts/basic/bin2c; echo "MAGIC_END;")
